@@ -48,6 +48,7 @@ HTMLActuator.prototype.clearContainer = function (container) {
 
 HTMLActuator.prototype.addTile = function (tile) {
   var self = this;
+  var theme = getTileTheme(tile.value);
 
   var wrapper   = document.createElement("div");
   var inner     = document.createElement("div");
@@ -55,14 +56,31 @@ HTMLActuator.prototype.addTile = function (tile) {
   var positionClass = this.positionClass(position);
 
   // We can't use classlist because it somehow glitches when replacing classes
-  var classes = ["tile", "tile-" + tile.value, positionClass];
+  var classes = ["tile", "tile-" + tile.value, positionClass, "tile-accent-" + theme.accent];
 
   if (tile.value > 2048) classes.push("tile-super");
 
   this.applyClasses(wrapper, classes);
+  wrapper.setAttribute("aria-label", tile.value + ", " + theme.name + " tile");
 
   inner.classList.add("tile-inner");
-  inner.textContent = tile.value;
+
+  var motif = document.createElement("span");
+  motif.classList.add("tile-motif");
+  motif.setAttribute("aria-hidden", "true");
+  motif.textContent = theme.motif;
+
+  var value = document.createElement("span");
+  value.classList.add("tile-value");
+  value.textContent = tile.value;
+
+  var name = document.createElement("span");
+  name.classList.add("tile-name");
+  name.textContent = theme.name;
+
+  inner.appendChild(motif);
+  inner.appendChild(value);
+  inner.appendChild(name);
 
   if (tile.previousPosition) {
     // Make sure that the tile gets rendered in the previous position first
